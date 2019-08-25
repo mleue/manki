@@ -14,6 +14,8 @@ def yield_files_from_dir_recursively(base_dir: Path):
 
 
 def filter_paths_by_extension(paths: List[Path], extensions: List[str]):
+    if not extensions:
+        yield from paths
     for p in paths:
         if p.suffix in extensions:
             yield p
