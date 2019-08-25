@@ -43,3 +43,12 @@ def resolve_nested_tags(frontmatter):
             new_tags.extend(tag.split("/"))
         frontmatter["tags"] = new_tags
         return frontmatter
+
+
+def is_question(line: str):
+    match = re.match(r".*\?$", line.strip())
+    return match is not None
+
+
+def yield_question_and_answer_pairs_from_body(body_text: str):
+    pass

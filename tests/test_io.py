@@ -5,6 +5,7 @@ from manki.io import (
     get_frontmatter_and_body,
     parse_frontmatter,
     resolve_nested_tags,
+    is_question,
 )
 
 
@@ -51,3 +52,8 @@ def test_resolve_nested_tags(datadir):
     frontmatter_text, _ = get_frontmatter_and_body(datadir / "test.md")
     frontmatter_obj = parse_frontmatter(frontmatter_text)
     assert expected == resolve_nested_tags(frontmatter_obj)
+
+
+def test_detect_question():
+    assert is_question("is this a question?")
+    assert not is_question("this is not a question")
