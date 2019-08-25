@@ -1,6 +1,6 @@
 ---
 title: test
-tags: [Notebooks/learning/something]
+tags: [Notebooks/flashcards/learning/unix]
 ---
 what is `dmesg`?
 - *d*river *mes*a*g*e

@@ -1,5 +1,6 @@
 from typing import List
 from pathlib import Path
+import yaml
 
 
 def yield_files_from_dir_recursively(base_dir: Path):
@@ -19,3 +20,19 @@ def filter_paths_by_extension(paths: List[Path], extensions: List[str]):
     for p in paths:
         if p.suffix in extensions:
             yield p
+
+
+def read_frontmatter(filepath: Path):
+    buffer = []
+    with filepath.open() as f:
+        for line in f:
+            if line[:3] == "---" and not buffer:
+                continue
+            elif line[:3] == "---":
+                return "\n".join(buffer)
+            else:
+                buffer.append(line)
+
+
+def parse_frontmatter(frontmatter_text: str):
+    return yaml.safe_load(frontmatter_text)
