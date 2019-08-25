@@ -46,9 +46,22 @@ def resolve_nested_tags(frontmatter):
 
 
 def is_question(line: str):
-    match = re.match(r".*\?$", line.strip())
+    match = re.match(r".*\?$", line)
     return match is not None
 
 
 def yield_question_and_answer_pairs_from_body(body_text: str):
-    pass
+    current_question = None
+    answer_buffer = []
+    for line in body_text.strip().split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        if is_question(line):
+            if current_question is not None and answer_buffer:
+                yield current_question, "\n".join(answer_buffer)
+            current_question = line
+            answer_buffer = []
+        else:
+            answer_buffer.append(line)
+    yield current_question, "\n".join(answer_buffer)
