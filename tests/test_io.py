@@ -4,6 +4,7 @@ from manki.io import (
     filter_paths_by_extension,
     read_frontmatter,
     parse_frontmatter,
+    resolve_nested_tags,
 )
 
 
@@ -27,9 +28,9 @@ def test_filter_paths_by_extension(datadir, extensions, exp_files):
 
 
 def test_read_frontmatter(datadir):
-    expected = """title: test
-    tags: [Notebooks/flashcards/learning/unix]"""
-    assert read_frontmatter(datadir / "test.md")
+    expected = "title: test\ntags: [Notebooks/flashcards/learning/unix]\n"
+    frontmatter_text = read_frontmatter(datadir / "test.md")
+    assert expected == frontmatter_text
 
 
 def test_parse_frontmatter(datadir):
@@ -37,4 +38,16 @@ def test_parse_frontmatter(datadir):
         "title": "test",
         "tags": ["Notebooks/flashcards/learning/unix"],
     }
-    assert parse_frontmatter(read_frontmatter(datadir / "test.md"))
+    frontmatter_obj = parse_frontmatter(read_frontmatter(datadir / "test.md"))
+    print(frontmatter_obj)
+    assert expected == frontmatter_obj
+
+
+def test_resolve_nested_tags(datadir):
+    expected = {
+        "title": "test",
+        "tags": ["Notebooks", "flashcards", "learning", "unix"],
+    }
+    assert expected == resolve_nested_tags(
+        parse_frontmatter(read_frontmatter(datadir / "test.md"))
+    )

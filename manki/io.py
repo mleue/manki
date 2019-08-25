@@ -29,9 +29,21 @@ def read_frontmatter(filepath: Path):
             if line[:3] == "---" and not buffer:
                 continue
             elif line[:3] == "---":
-                return "\n".join(buffer)
+                return "".join(buffer)
             else:
                 buffer.append(line)
+
+
+def resolve_nested_tags(frontmatter):
+    """Resolve notable-style nested tags (nested via / separators)."""
+    if "tags" not in frontmatter:
+        return frontmatter
+    else:
+        new_tags = []
+        for tag in frontmatter["tags"]:
+            new_tags.extend(tag.split("/"))
+        frontmatter["tags"] = new_tags
+        return frontmatter
 
 
 def parse_frontmatter(frontmatter_text: str):
