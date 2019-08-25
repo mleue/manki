@@ -1,5 +1,6 @@
 from typing import List
 from pathlib import Path
+import re
 import yaml
 
 
@@ -22,16 +23,14 @@ def filter_paths_by_extension(paths: List[Path], extensions: List[str]):
             yield p
 
 
-def read_frontmatter(filepath: Path):
-    buffer = []
-    with filepath.open() as f:
-        for line in f:
-            if line[:3] == "---" and not buffer:
-                continue
-            elif line[:3] == "---":
-                return "".join(buffer)
-            else:
-                buffer.append(line)
+def get_frontmatter_and_body(filepath: Path):
+    text = filepath.read_text()
+    _, frontmatter, body = re.split("---\n", text)
+    return frontmatter, body
+
+
+def parse_frontmatter(frontmatter_text: str):
+    return yaml.safe_load(frontmatter_text)
 
 
 def resolve_nested_tags(frontmatter):
@@ -44,7 +43,3 @@ def resolve_nested_tags(frontmatter):
             new_tags.extend(tag.split("/"))
         frontmatter["tags"] = new_tags
         return frontmatter
-
-
-def parse_frontmatter(frontmatter_text: str):
-    return yaml.safe_load(frontmatter_text)

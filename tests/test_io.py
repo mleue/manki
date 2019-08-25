@@ -2,7 +2,7 @@ import pytest
 from manki.io import (
     yield_files_from_dir_recursively,
     filter_paths_by_extension,
-    read_frontmatter,
+    get_frontmatter_and_body,
     parse_frontmatter,
     resolve_nested_tags,
 )
@@ -27,10 +27,10 @@ def test_filter_paths_by_extension(datadir, extensions, exp_files):
     assert expected == list(filter_paths_by_extension(paths, extensions))
 
 
-def test_read_frontmatter(datadir):
-    expected = "title: test\ntags: [Notebooks/flashcards/learning/unix]\n"
-    frontmatter_text = read_frontmatter(datadir / "test.md")
-    assert expected == frontmatter_text
+def test_get_frontmatter_and_body(datadir):
+    front = "title: test\ntags: [Notebooks/flashcards/learning/unix]\n"
+    frontmatter, body = get_frontmatter_and_body(datadir / "test.md")
+    assert front == frontmatter
 
 
 def test_parse_frontmatter(datadir):
@@ -38,8 +38,8 @@ def test_parse_frontmatter(datadir):
         "title": "test",
         "tags": ["Notebooks/flashcards/learning/unix"],
     }
-    frontmatter_obj = parse_frontmatter(read_frontmatter(datadir / "test.md"))
-    print(frontmatter_obj)
+    frontmatter_text, _ = get_frontmatter_and_body(datadir / "test.md")
+    frontmatter_obj = parse_frontmatter(frontmatter_text)
     assert expected == frontmatter_obj
 
 
@@ -48,6 +48,6 @@ def test_resolve_nested_tags(datadir):
         "title": "test",
         "tags": ["Notebooks", "flashcards", "learning", "unix"],
     }
-    assert expected == resolve_nested_tags(
-        parse_frontmatter(read_frontmatter(datadir / "test.md"))
-    )
+    frontmatter_text, _ = get_frontmatter_and_body(datadir / "test.md")
+    frontmatter_obj = parse_frontmatter(frontmatter_text)
+    assert expected == resolve_nested_tags(frontmatter_obj)
