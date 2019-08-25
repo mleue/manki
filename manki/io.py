@@ -1,3 +1,4 @@
+from typing import List
 from pathlib import Path
 
 
@@ -10,3 +11,9 @@ def yield_files_from_dir_recursively(base_dir: Path):
             dirs.append(p)
     for d in dirs:
         yield from yield_files_from_dir_recursively(base_dir / d)
+
+
+def filter_paths_by_extension(paths: List[Path], extensions: List[str]):
+    for p in paths:
+        if p.suffix in extensions:
+            yield p
