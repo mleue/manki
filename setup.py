@@ -16,6 +16,6 @@ setup(
     },
     keywords="anki markdown flashcard",
     packages=find_packages(exclude=["tests"]),
-    install_requires=["genanki", "click", "pyyaml"],
+    install_requires=["genanki", "click", "pyyaml", "markdown", "pygments"],
     extras_require={"dev": ["pytest"]},
 )
