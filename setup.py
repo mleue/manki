@@ -8,14 +8,17 @@ setup(
     author="Michael Leue",
     author_email="michael@mleue.com",
     license="MIT",
-    classifiers=[
-        "Programming Language :: Python :: 3",
-    ],
-    entry_points={
-        "console_scripts": ["manki=manki.cli:manki_cli"],
-    },
+    classifiers=["Programming Language :: Python :: 3"],
+    entry_points={"console_scripts": ["manki=manki.cli:manki_cli"]},
     keywords="anki markdown flashcard",
     packages=find_packages(exclude=["tests"]),
-    install_requires=["genanki", "click", "pyyaml", "markdown", "pygments"],
+    install_requires=[
+        "genanki",
+        "click",
+        "pyyaml",
+        "markdown",
+        "pygments",
+        "selectolax",
+    ],
     extras_require={"dev": ["pytest"]},
 )

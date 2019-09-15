@@ -8,11 +8,11 @@ def yield_files_from_dir_recursively(base_dir: Path):
     dirs = []
     for p in base_dir.iterdir():
         if p.is_file():
-            yield base_dir / p
+            yield p
         else:
             dirs.append(p)
     for d in dirs:
-        yield from yield_files_from_dir_recursively(base_dir / d)
+        yield from yield_files_from_dir_recursively(d)
 
 
 def filter_paths_by_extension(paths: List[Path], extensions: List[str]):
@@ -25,7 +25,7 @@ def filter_paths_by_extension(paths: List[Path], extensions: List[str]):
 
 def get_frontmatter_and_body(filepath: Path):
     text = filepath.read_text()
-    _, frontmatter, body = re.split("---\n", text)
+    _, frontmatter, body = re.split(r"---\n", text, maxsplit=2)
     return frontmatter, body
 
 
@@ -54,7 +54,7 @@ def yield_question_and_answer_pairs_from_body(body_text: str):
     current_question = None
     answer_buffer = []
     for line in body_text.strip().split("\n"):
-        line = line.strip()
+        # line = line.strip()
         if not line:
             continue
         if is_question(line):
