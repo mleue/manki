@@ -95,6 +95,7 @@ MODEL = genanki.Model(
         }
     ],
     # standard css for cards generated from this note
+    # TODO allow adding additional css via cli option
     css="""
         .card {
             font-family: 'Crimson Pro', 'Crimson Text', 'Cardo', 'Times', 'serif';
@@ -108,6 +109,8 @@ MODEL = genanki.Model(
 
 # custom note that uses only the question field for guid generation
 # instead of all fields by default
+# TODO maybe the id should actually not be based on the html question but
+# rather on the original markdown question (less likely to change)
 class FirstFieldGUIDNote(genanki.Note):
     @property
     def guid(self):
