@@ -118,5 +118,5 @@ class FirstFieldGUIDNote(genanki.Note):
 
 
 DECK_NAME = "manki flashcards"
-# TODO guid based on deck name?
+# TODO guid based on deck name? hash to int?
 DECK = genanki.Deck(123, DECK_NAME)

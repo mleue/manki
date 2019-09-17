@@ -1,3 +1,4 @@
+from pathlib import Path
 from selectolax.parser import HTMLParser
 import markdown
 
@@ -11,10 +12,26 @@ def markdown_to_html(markdown_text: str):
 
 
 # TODO this should go into some html module
-def get_image_sources(html: str):
-    selector = "img"
-    sources = []
-    for node in HTMLParser(html).css(selector):
+# TODO write test
+def get_img_src_paths(html: str):
+    for node in HTMLParser(html).css("img"):
         if "src" in node.attributes:
-            sources.append(node.attributes["src"])
-    return sources
+            yield Path(node.attributes["src"])
+
+
+# TODO write test
+def prune_img_src_paths(html: str):
+    tree = HTMLParser(html)
+    for node in tree.css("img"):
+        if "src" in node.attributes:
+            path = Path(node.attributes["src"])
+            node.attrs["src"] = path.absolute()
+    return tree.html
+
+
+class NoteSide:
+    def __init__(self, markdown_text: str):
+        self.markdown = markdown_text
+        self.html = markdown_to_html(markdown_text)
+        self.img_src_paths = list(get_img_src_paths(self.html))
+        self.html = prune_img_src_paths(self.html)
