@@ -43,4 +43,9 @@ That being said, there is a suggested process for deleting markdown notes and ke
 
 ### Media Files
 
+There are currently 2 supported ways to resolve media files from `<img>` tags.
+
+1. Providing an explicit media directory with `--media-path/-m`. In that case, only the filename part of the `src` attribute will be used and the file will be expected to be situated in the specified directory.
+2. Not providing a `--media-path/-m`. In that case absolute `src` paths will be kept unchanged, relative `src` paths will be prefixed and resolved with the directory of the markdown file that the note originates from.
+
 You must use media files with globally unique filenames (not filepaths but actual filenames). For any duplicate filenames, only the initial one will end up in the Anki package. Anki uses a single media directory per collection. Anki cards implicitly source (e.g. within `img` tags) from that directory.
