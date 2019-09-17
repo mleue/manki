@@ -15,7 +15,7 @@ from .model import MODEL, FirstFieldGUIDNote, DECK
 
 
 # TODO notify when duplicate questions are encountered
-def generate_cards(notes_path: Path, media_path: Path = None):
+def generate_cards(notes_path: Path, out_path: Path, media_path: Path):
     files = yield_files_from_dir_recursively(notes_path)
     img_paths = []
     # TODO file types as cli option
@@ -74,13 +74,15 @@ def generate_cards(notes_path: Path, media_path: Path = None):
     click.echo(img_paths)
     pgk = genanki.Package(deck_or_decks=DECK, media_files=img_paths)
     # TODO specifiy out path as cli option, default to current cli path
-    pgk.write_to_file(Path.home() / "Downloads" / "genanki.apkg")
+    out_path = Path(out_path) if out_path is not None else notes_path
+    pgk.write_to_file(out_path / "genanki.apkg")
 
 
 @click.command()
 @click.argument("notes_path")
+@click.option("-o", "--out-path", default=None, type=str)
 @click.option("-m", "--media-path", default=None, type=str)
-def manki_cli(notes_path, media_path):
+def manki_cli(notes_path, out_path, media_path):
     # TODO also check for media_path availability if used
     p = Path(notes_path)
     if not p.exists():
@@ -89,4 +91,4 @@ def manki_cli(notes_path, media_path):
         click.echo(f"Path {p.absolute()} is not a dir.")
     else:
         click.echo(p.absolute())
-        generate_cards(p, media_path)
+        generate_cards(p, out_path, media_path)
