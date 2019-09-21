@@ -3,10 +3,14 @@ from manki.io import (
     get_frontmatter_and_body,
     yield_question_and_answer_pairs_from_body,
 )
-from manki.html import markdown_to_html
+from manki.html import get_img_src_paths, prune_img_src_paths
 
 
-def test_markdown_to_html(datadir):
-    _, body = get_frontmatter_and_body(datadir / "test.md")
-    qas = list(yield_question_and_answer_pairs_from_body(body))
-    assert markdown_to_html(qas[0][0]).startswith("<p>what is")
+@pytest.mark.parametrize("html,exp",
+    [
+        ("<div><img src=\"abc\" /></div>", ["abc"]),
+        ("<div><img src=\"abc\" /><img src=\"def\" /></div>", ["abc", "def"]),
+    ]
+)
+def test_get_img_src_paths(html, exp):
+    assert exp == list(str(p) for p in get_img_src_paths(html))

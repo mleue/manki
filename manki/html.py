@@ -11,8 +11,6 @@ def markdown_to_html(markdown_text: str):
     )
 
 
-# TODO this should go into some html module
-# TODO write test
 def get_img_src_paths(html: str):
     for node in HTMLParser(html).css("img"):
         if "src" in node.attributes:

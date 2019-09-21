@@ -52,10 +52,10 @@ class NotesFile:
                 yield NoteSide(q_md), NoteSide(a_md)
 
     def _use_notes_from_this_file(self):
-        return self._has_whitelist_tags() and not self._title_is_blacklisted()
+        return self._has_whitelist_tags() and self._title_is_not_blacklisted()
 
     def _has_whitelist_tags(self):
         return set(self.tag_whitelist).intersection(self.frontmatter["tags"])
 
-    def _title_is_blacklisted(self):
+    def _title_is_not_blacklisted(self):
         return self.frontmatter["title"] in self.title_blacklist
