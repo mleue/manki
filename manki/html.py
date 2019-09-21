@@ -17,11 +17,10 @@ def get_img_src_paths(html: str):
             yield Path(node.attributes["src"])
 
 
-# TODO write test
 def prune_img_src_paths(html: str):
     tree = HTMLParser(html)
     for node in tree.css("img"):
         if "src" in node.attributes:
             path = Path(node.attributes["src"])
-            node.attrs["src"] = path.absolute()
-    return tree.html
+            node.attrs["src"] = path.name
+    return tree.body.child.html

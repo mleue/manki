@@ -58,4 +58,4 @@ class NotesFile:
         return set(self.tag_whitelist).intersection(self.frontmatter["tags"])
 
     def _title_is_not_blacklisted(self):
-        return self.frontmatter["title"] in self.title_blacklist
+        return not self.frontmatter["title"] in self.title_blacklist

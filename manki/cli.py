@@ -20,7 +20,6 @@ def generate_cards(notes_path: Path, out_path: Path, media_path: Path):
     img_paths = []
     # TODO file types as cli option
     for filepath in filter_paths_by_extension(files, ".md"):
-        click.echo(filepath)
         # TODO tag whitelisting via options
         # TODO title blacklisting via options
         # TODO "flashcards" tag whitelist is implementation detail for notable
@@ -29,6 +28,7 @@ def generate_cards(notes_path: Path, out_path: Path, media_path: Path):
             tag_whitelist=["flashcards"],
             title_blacklist=["goals", "questions"],
         )
+        i = 0
         for q_side, a_side in notes_file.yield_qa_pairs():
             img_paths.extend(q_side.img_src_paths + a_side.img_src_paths)
             # TODO untangle this
@@ -38,6 +38,8 @@ def generate_cards(notes_path: Path, out_path: Path, media_path: Path):
                 tags=notes_file.frontmatter["tags"],
             )
             DECK.add_note(note)
+            i += 1
+        click.echo(f"{i} notes from file {filepath}")
 
     # TODO check that paths actually resolve and exist
     # if media path is provided, combine that path with each img_paths filename
