@@ -27,11 +27,3 @@ def prune_img_src_paths(html: str):
             path = Path(node.attributes["src"])
             node.attrs["src"] = path.absolute()
     return tree.html
-
-
-class NoteSide:
-    def __init__(self, markdown_text: str):
-        self.markdown = markdown_text
-        self.html = markdown_to_html(markdown_text)
-        self.img_src_paths = list(get_img_src_paths(self.html))
-        self.html = prune_img_src_paths(self.html)

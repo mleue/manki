@@ -73,7 +73,6 @@ def generate_cards(notes_path: Path, out_path: Path, media_path: Path):
 
     click.echo(img_paths)
     pgk = genanki.Package(deck_or_decks=DECK, media_files=img_paths)
-    # TODO specifiy out path as cli option, default to current cli path
     out_path = Path(out_path) if out_path is not None else notes_path
     pgk.write_to_file(out_path / "genanki.apkg")
 
