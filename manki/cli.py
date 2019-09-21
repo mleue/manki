@@ -10,7 +10,7 @@ from .io import (
     resolve_nested_tags,
     yield_question_and_answer_pairs_from_body,
 )
-from .convert import NoteSide
+from .note import NotesFile, NoteSide
 from .model import MODEL, FirstFieldGUIDNote, DECK
 
 
@@ -19,42 +19,25 @@ def generate_cards(notes_path: Path, out_path: Path, media_path: Path):
     files = yield_files_from_dir_recursively(notes_path)
     img_paths = []
     # TODO file types as cli option
-    for file in filter_paths_by_extension(files, ".md"):
-        click.echo(file)
-        frontmatter_text, body_text = get_frontmatter_and_body(file)
-        frontmatter = parse_frontmatter(frontmatter_text)
-        frontmatter = resolve_nested_tags(frontmatter)
+    for filepath in filter_paths_by_extension(files, ".md"):
+        click.echo(filepath)
         # TODO tag whitelisting via options
         # TODO title blacklisting via options
-        # TODO refactor out the tag whitelisting and title blacklisting
-        if "flashcards" in frontmatter["tags"] and frontmatter[
-            "title"
-        ] not in ("goals", "questions"):
-            # TODO this is an implementation detail for notable
-            frontmatter["tags"].remove("Notebooks")
-            # TODO make this explicit somewhere
-            # TODO context should be both last tag AND title
-            context = frontmatter["tags"][-1]
-            # TODO this too is an implementation detail for when "title" is available
-            frontmatter["tags"].append(frontmatter["title"])
-            # TODO put this in parse_frontmatter
-            frontmatter["tags"] = [
-                tag.replace(" ", "_") for tag in frontmatter["tags"]
-            ]
-            click.echo(frontmatter)
-            for q, a in yield_question_and_answer_pairs_from_body(body_text):
-                click.echo(q)
-                click.echo(a)
-                q_side = NoteSide(q)
-                a_side = NoteSide(a)
-                img_paths.extend(q_side.img_src_paths + a_side.img_src_paths)
-                # TODO untangle this
-                note = FirstFieldGUIDNote(
-                    model=MODEL,
-                    fields=[q_side.html, a_side.html, context],
-                    tags=frontmatter["tags"],
-                )
-                DECK.add_note(note)
+        # TODO "flashcards" tag whitelist is implementation detail for notable
+        notes_file = NotesFile(
+            filepath,
+            tag_whitelist=["flashcards"],
+            title_blacklist=["goals", "questions"],
+        )
+        for q_side, a_side in notes_file.yield_qa_pairs():
+            img_paths.extend(q_side.img_src_paths + a_side.img_src_paths)
+            # TODO untangle this
+            note = FirstFieldGUIDNote(
+                model=MODEL,
+                fields=[q_side.html, a_side.html, notes_file.context],
+                tags=notes_file.frontmatter["tags"],
+            )
+            DECK.add_note(note)
 
     # TODO check that paths actually resolve and exist
     # if media path is provided, combine that path with each img_paths filename

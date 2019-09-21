@@ -14,3 +14,6 @@ is it possible to use python here as well?
 yes = "it is"
 print(yes)
 ```
+
+how about images?
+![](@attachment/image.png)
