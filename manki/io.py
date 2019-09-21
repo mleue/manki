@@ -41,6 +41,7 @@ def resolve_nested_tags(frontmatter):
         new_tags = []
         for tag in frontmatter["tags"]:
             new_tags.extend(tag.split("/"))
+        new_tags = [t.replace(" ", "_") for t in new_tags]
         frontmatter["tags"] = new_tags
         return frontmatter
 

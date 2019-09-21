@@ -32,17 +32,10 @@ class NotesFile:
         self.title_blacklist = (
             [] if title_blacklist is None else title_blacklist
         )
-        # TODO this is an implementation detail for notable
-        self.frontmatter["tags"].remove("Notebooks")
-        # TODO make this explicit somewhere
-        # TODO context should be both last tag AND title
-        self.context = self.frontmatter["tags"][-1]
-        # TODO this too is an implementation detail for when "title" is available
+        # context is both last tag AND title
+        self.context = self._build_context()
+        # add title to tags
         self.frontmatter["tags"].append(self.frontmatter["title"])
-        # TODO put this in parse_frontmatter
-        self.frontmatter["tags"] = [
-            tag.replace(" ", "_") for tag in self.frontmatter["tags"]
-        ]
 
     def yield_qa_pairs(self):
         if self._use_notes_from_this_file():
@@ -50,6 +43,9 @@ class NotesFile:
                 self.body_text
             ):
                 yield NoteSide(q_md), NoteSide(a_md)
+
+    def _build_context(self) -> str:
+        return f"{self.frontmatter["tags"][-1]}, {self.frontmatter["title"]}"
 
     def _use_notes_from_this_file(self):
         return self._has_whitelist_tags() and self._title_is_not_blacklisted()
