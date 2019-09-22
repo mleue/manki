@@ -34,7 +34,7 @@ def test_get_frontmatter_and_body(datadir):
     frontmatter, body = get_frontmatter_and_body(datadir / "test.md")
     assert front == frontmatter
     assert body[:4] == "what"
-    assert body[-4:] == "ng)\n"
+    assert body[-4:] == "wer\n"
 
 
 def test_parse_frontmatter(datadir):
@@ -59,14 +59,16 @@ def test_resolve_nested_tags(datadir):
 
 def test_detect_question():
     assert is_question("is this a question?")
+    assert is_question("?is this a question")
     assert not is_question("this is not a question")
 
 
 def test_yield_question_and_answer_pairs_from_body(datadir):
     _, body = get_frontmatter_and_body(datadir / "test.md")
     pairs = list(yield_question_and_answer_pairs_from_body(body))
-    assert len(pairs) == 4
+    assert len(pairs) == 5
     assert pairs[0][0] == "what is `dmesg`?"
     assert pairs[1][1] == "`dmesg --follow`"
     assert pairs[2][0] == "is it possible to use python here as well?"
     assert pairs[2][1][-3:] == "```"
+    assert pairs[4][0] == "how about double line questions?\nhere comes the second line"

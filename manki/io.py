@@ -47,7 +47,7 @@ def resolve_nested_tags(frontmatter):
 
 
 def is_question(line: str):
-    match = re.match(r".*\?$", line)
+    match = re.match(r"^\?|.*\?$", line)
     return match is not None
 
 
@@ -61,20 +61,27 @@ def check_path_is_dir(p: Path):
         raise ValueError(f"Path {p.absolute()} is not a dir.")
 
 
-# TODO more robust q-a delimiters
 # TODO q-a delimiters can be set via regex inputs
 def yield_question_and_answer_pairs_from_body(body_text: str):
-    current_question = None
+    question_buffer = []
     answer_buffer = []
     for line in body_text.strip().split("\n"):
         # line = line.strip()
         if not line:
             continue
         if is_question(line):
-            if current_question is not None and answer_buffer:
-                yield current_question, "\n".join(answer_buffer)
-            current_question = line
-            answer_buffer = []
+            # TODO make this general
+            if line[0] == "?":
+                line = line[1:]
+            # if there is an a and a q buffer, then the current line starts
+            # a new question
+            if answer_buffer and question_buffer:
+                yield "\n".join(question_buffer), "\n".join(answer_buffer)
+                question_buffer = [line]
+                answer_buffer = []
+            else:
+                question_buffer.append(line)
         else:
             answer_buffer.append(line)
-    yield current_question, "\n".join(answer_buffer)
+    if question_buffer is not None:
+        yield "\n".join(question_buffer), "\n".join(answer_buffer)
