@@ -9,6 +9,8 @@ from .io import (
     parse_frontmatter,
     resolve_nested_tags,
     yield_question_and_answer_pairs_from_body,
+    check_path_exists,
+    check_path_is_dir,
 )
 from .note import NotesFile, NoteSide
 from .model import MODEL, FirstFieldGUIDNote, DECK
@@ -75,14 +77,19 @@ def generate_cards(
 def manki_cli(
     notes_path, out_path, media_path, tag_whitelist, title_blacklist, file_type
 ):
-    # TODO also check for media_path availability if used
-    p = Path(notes_path)
-    if not p.exists():
-        click.echo(f"Path {p.absolute()} does not exist.")
-    elif not p.is_dir():
-        click.echo(f"Path {p.absolute()} is not a dir.")
-    else:
-        click.echo(p.absolute())
-        generate_cards(
-            p, out_path, media_path, tag_whitelist, title_blacklist, file_type
-        )
+    try:
+        for p in [notes_path, out_path, media_path]:
+            check_path_exists(Path(p))
+            check_path_is_dir(Path(p))
+    except ValueError as e:
+        click.echo(str(e))
+        return
+
+    generate_cards(
+        Path(notes_path),
+        Path(out_path),
+        Path(media_path),
+        tag_whitelist,
+        title_blacklist,
+        file_type,
+    )

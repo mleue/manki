@@ -51,6 +51,16 @@ def is_question(line: str):
     return match is not None
 
 
+def check_path_exists(p: Path):
+    if not p.exists():
+        raise ValueError(f"Path {p} does not exist.")
+
+
+def check_path_is_dir(p: Path):
+    if not p.is_dir():
+        raise ValueError(f"Path {p.absolute()} is not a dir.")
+
+
 # TODO more robust q-a delimiters
 # TODO q-a delimiters can be set via regex inputs
 def yield_question_and_answer_pairs_from_body(body_text: str):
