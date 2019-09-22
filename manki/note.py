@@ -28,14 +28,13 @@ class NotesFile:
         self.front_text, self.body_text = get_frontmatter_and_body(self.path)
         self.frontmatter = parse_frontmatter(self.front_text)
         self.frontmatter = resolve_nested_tags(self.frontmatter)
+        self.tags = self.frontmatter["tags"]
+        self.title = self.frontmatter["title"]
         self.tag_whitelist = [] if tag_whitelist is None else tag_whitelist
         self.title_blacklist = (
             [] if title_blacklist is None else title_blacklist
         )
-        # context is both last tag AND title
         self.context = self._build_context()
-        # add title to tags
-        self.frontmatter["tags"].append(self.frontmatter["title"])
 
     def yield_qa_pairs(self):
         if self._use_notes_from_this_file():
@@ -45,9 +44,7 @@ class NotesFile:
                 yield NoteSide(q_md), NoteSide(a_md)
 
     def _build_context(self) -> str:
-        last_tag = self.frontmatter["tags"][-1]
-        title = self.frontmatter["title"]
-        return f"{last_tag}, {title}"
+        return f"{self.tags[-1]}, {self.title}"
 
     def _use_notes_from_this_file(self):
         return self._has_whitelist_tags() and self._title_is_not_blacklisted()

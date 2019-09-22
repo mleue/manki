@@ -27,7 +27,6 @@ def generate_cards(
     # TODO file types as cli option
     for filepath in filter_paths_by_extension(files, ".md"):
         click.echo(filepath)
-        # TODO "flashcards" tag whitelist is implementation detail for notable
         notes_file = NotesFile(
             filepath,
             tag_whitelist=tag_whitelist,
@@ -36,11 +35,10 @@ def generate_cards(
         i = 0
         for q_side, a_side in notes_file.yield_qa_pairs():
             img_paths.extend(q_side.img_src_paths + a_side.img_src_paths)
-            # TODO untangle this
             note = FirstFieldGUIDNote(
                 model=MODEL,
                 fields=[q_side.html, a_side.html, notes_file.context],
-                tags=notes_file.frontmatter["tags"],
+                tags=notes_file.tags + [notes_file.title],
             )
             DECK.add_note(note)
             i += 1
