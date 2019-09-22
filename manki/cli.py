@@ -27,6 +27,7 @@ def generate_cards(
 ):
     files = yield_files_from_dir_recursively(notes_path)
     img_paths = []
+    questions_set = set()
     for filepath in filter_paths_by_extension(files, file_type):
         click.echo(filepath)
         notes_file = NotesFile(
@@ -36,6 +37,12 @@ def generate_cards(
         )
         i = 0
         for q_side, a_side in notes_file.yield_qa_pairs():
+            # TODO make this part of a NotesDirectory class
+            if q_side.markdown in questions_set:
+                click.echo(f"Duplicate question encountered {q_side.markdown}. Disregarding.")
+                continue
+            else:
+                questions_set.add(q_side.markdown)
             img_paths.extend(q_side.img_src_paths + a_side.img_src_paths)
             note = FirstFieldGUIDNote(
                 model=MODEL,
@@ -79,16 +86,17 @@ def manki_cli(
 ):
     try:
         for p in [notes_path, out_path, media_path]:
-            check_path_exists(Path(p))
-            check_path_is_dir(Path(p))
+            if p is not None:
+                check_path_exists(Path(p))
+                check_path_is_dir(Path(p))
     except ValueError as e:
         click.echo(str(e))
         return
 
     generate_cards(
         Path(notes_path),
-        Path(out_path),
-        Path(media_path),
+        Path(out_path) if out_path is not None else out_path,
+        Path(media_path) if media_path is not None else media_path,
         tag_whitelist,
         title_blacklist,
         file_type,
