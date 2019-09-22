@@ -21,11 +21,11 @@ def generate_cards(
     media_path: Path,
     tag_whitelist: List[str],
     title_blacklist: List[str],
+    file_type: List[str],
 ):
     files = yield_files_from_dir_recursively(notes_path)
     img_paths = []
-    # TODO file types as cli option
-    for filepath in filter_paths_by_extension(files, ".md"):
+    for filepath in filter_paths_by_extension(files, file_type):
         click.echo(filepath)
         notes_file = NotesFile(
             filepath,
@@ -71,7 +71,10 @@ def generate_cards(
 @click.option("-m", "--media-path", default=None, type=str)
 @click.option("-w", "--tag-whitelist", type=str, multiple=True)
 @click.option("-b", "--title-blacklist", type=str, multiple=True)
-def manki_cli(notes_path, out_path, media_path, tag_whitelist, title_blacklist):
+@click.option("-f", "--file-type", type=str, default=(".md",), multiple=True)
+def manki_cli(
+    notes_path, out_path, media_path, tag_whitelist, title_blacklist, file_type
+):
     # TODO also check for media_path availability if used
     p = Path(notes_path)
     if not p.exists():
@@ -80,4 +83,6 @@ def manki_cli(notes_path, out_path, media_path, tag_whitelist, title_blacklist):
         click.echo(f"Path {p.absolute()} is not a dir.")
     else:
         click.echo(p.absolute())
-        generate_cards(p, out_path, media_path, tag_whitelist, title_blacklist)
+        generate_cards(
+            p, out_path, media_path, tag_whitelist, title_blacklist, file_type
+        )
