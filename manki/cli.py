@@ -15,18 +15,23 @@ from .model import MODEL, FirstFieldGUIDNote, DECK
 
 
 # TODO notify when duplicate questions are encountered
-def generate_cards(notes_path: Path, out_path: Path, media_path: Path):
+def generate_cards(
+    notes_path: Path,
+    out_path: Path,
+    media_path: Path,
+    tag_whitelist: List[str],
+    title_blacklist: List[str],
+):
     files = yield_files_from_dir_recursively(notes_path)
     img_paths = []
     # TODO file types as cli option
     for filepath in filter_paths_by_extension(files, ".md"):
-        # TODO tag whitelisting via options
-        # TODO title blacklisting via options
+        click.echo(filepath)
         # TODO "flashcards" tag whitelist is implementation detail for notable
         notes_file = NotesFile(
             filepath,
-            tag_whitelist=["flashcards"],
-            title_blacklist=["goals", "questions"],
+            tag_whitelist=tag_whitelist,
+            title_blacklist=title_blacklist,
         )
         i = 0
         for q_side, a_side in notes_file.yield_qa_pairs():
@@ -66,7 +71,9 @@ def generate_cards(notes_path: Path, out_path: Path, media_path: Path):
 @click.argument("notes_path")
 @click.option("-o", "--out-path", default=None, type=str)
 @click.option("-m", "--media-path", default=None, type=str)
-def manki_cli(notes_path, out_path, media_path):
+@click.option("-w", "--tag-whitelist", type=str, multiple=True)
+@click.option("-b", "--title-blacklist", type=str, multiple=True)
+def manki_cli(notes_path, out_path, media_path, tag_whitelist, title_blacklist):
     # TODO also check for media_path availability if used
     p = Path(notes_path)
     if not p.exists():
@@ -75,4 +82,4 @@ def manki_cli(notes_path, out_path, media_path):
         click.echo(f"Path {p.absolute()} is not a dir.")
     else:
         click.echo(p.absolute())
-        generate_cards(p, out_path, media_path)
+        generate_cards(p, out_path, media_path, tag_whitelist, title_blacklist)

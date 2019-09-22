@@ -45,13 +45,15 @@ class NotesFile:
                 yield NoteSide(q_md), NoteSide(a_md)
 
     def _build_context(self) -> str:
-        return f"{self.frontmatter["tags"][-1]}, {self.frontmatter["title"]}"
+        last_tag = self.frontmatter["tags"][-1]
+        title = self.frontmatter["title"]
+        return f"{last_tag}, {title}"
 
     def _use_notes_from_this_file(self):
         return self._has_whitelist_tags() and self._title_is_not_blacklisted()
 
     def _has_whitelist_tags(self):
-        return set(self.tag_whitelist).intersection(self.frontmatter["tags"])
+        return self.tag_whitelist and set(self.tag_whitelist).intersection(self.frontmatter["tags"])
 
     def _title_is_not_blacklisted(self):
         return not self.frontmatter["title"] in self.title_blacklist
