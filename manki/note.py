@@ -1,6 +1,7 @@
 from typing import List
 from pathlib import Path
 import click
+import genanki
 from .io import (
     get_frontmatter_and_body,
     parse_frontmatter,
@@ -10,7 +11,7 @@ from .io import (
     filter_paths_by_extension,
 )
 from .html import markdown_to_html, get_img_src_paths, prune_img_src_paths
-from .model import MODEL, FirstFieldGUIDNote
+from .model import MODEL
 
 
 class NoteSide:
@@ -55,7 +56,7 @@ class Note:
             return abs_paths + rel_paths
 
     def to_genanki_note(self):
-        return FirstFieldGUIDNote(
+        return genanki.Note(
             model=MODEL,
             fields=[self.q_side.html, self.a_side.html, self.context],
             tags=self.tags + [self.title],
@@ -131,6 +132,7 @@ class NotesDirectory:
         )
         self.questions = dict()
 
+    # TODO yield only filepaths here
     def yield_notes(self):
         files = yield_files_from_dir_recursively(self.path)
         for filepath in filter_paths_by_extension(files, self.file_type):

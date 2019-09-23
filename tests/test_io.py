@@ -33,7 +33,7 @@ def test_get_frontmatter_and_body(datadir):
     front = "title: test\ntags: [Notebooks/flashcards/learning/unix]\n"
     frontmatter, body = get_frontmatter_and_body(datadir / "test.md")
     assert front == frontmatter
-    assert body[:4] == "what"
+    assert body[:4] == "\n# t"
     assert body[-4:] == "wer\n"
 
 
@@ -58,14 +58,17 @@ def test_resolve_nested_tags(datadir):
 
 
 def test_detect_question():
-    assert is_question("is this a question?")
-    assert is_question("?is this a question")
-    assert not is_question("this is not a question")
+    matcher = r".*\?$"
+    assert is_question("is this a question?", matcher)
+    matcher = r"^\?"
+    assert is_question("?is this a question", matcher)
+    assert not is_question("this is not a question", matcher)
 
 
 def test_yield_question_and_answer_pairs_from_body(datadir):
     _, body = get_frontmatter_and_body(datadir / "test.md")
     pairs = list(yield_question_and_answer_pairs_from_body(body))
+    print(pairs)
     assert len(pairs) == 5
     assert pairs[0][0] == "what is `dmesg`?"
     assert pairs[1][1] == "`dmesg --follow`"

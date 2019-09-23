@@ -2,6 +2,9 @@
 title: test
 tags: [Notebooks/flashcards/learning/unix]
 ---
+
+# test
+
 what is `dmesg`?
 - *d*river *mes*a*g*e
 - unix command that prints the message buffer of the kernel

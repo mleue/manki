@@ -46,8 +46,8 @@ def resolve_nested_tags(frontmatter):
         return frontmatter
 
 
-def is_question(line: str):
-    match = re.match(r"^\?|.*\?$", line)
+def is_question(line: str, matcher: str):
+    match = re.match(matcher, line)
     return match is not None
 
 
@@ -66,27 +66,32 @@ def read_file_with_default(p: str, default_file: str):
     return file.read_text()
 
 
-# TODO q-a delimiters can be set via regex inputs
+# TODO matchers can be set via regex inputs
 def yield_question_and_answer_pairs_from_body(body_text: str):
+    matchers = [(r"(.*\?)$", False), (r"^\?(.*)", True)]
     question_buffer = []
     answer_buffer = []
     for line in body_text.strip().split("\n"):
-        # line = line.strip()
         if not line:
             continue
-        if is_question(line):
-            # TODO make this general
-            if line[0] == "?":
-                line = line[1:]
-            # if there is an a and a q buffer, then the current line starts
-            # a new question
-            if answer_buffer and question_buffer:
-                yield "\n".join(question_buffer), "\n".join(answer_buffer)
-                question_buffer = [line]
-                answer_buffer = []
-            else:
-                question_buffer.append(line)
+        for matcher, remove_matcher in matchers:
+            if is_question(line, matcher):
+                if remove_matcher:
+                    line = re.sub(matcher, r"\1", line)
+                # if there is an a and a q buffer, then the current line starts
+                # a new question
+                if answer_buffer and question_buffer:
+                    yield "\n".join(question_buffer), "\n".join(answer_buffer)
+                    question_buffer = [line]
+                    answer_buffer = []
+                else:
+                    question_buffer.append(line)
+                break
+        # if none of the matchers matched a question, then it's an answer line
         else:
-            answer_buffer.append(line)
+            # only store answers if we have an active question
+            if question_buffer:
+                answer_buffer.append(line)
+    # flush out the last qa pair
     if question_buffer is not None:
         yield "\n".join(question_buffer), "\n".join(answer_buffer)
