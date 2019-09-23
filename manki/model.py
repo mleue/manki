@@ -20,16 +20,8 @@ MODEL = genanki.Model(
             "afmt": "{{FrontSide}}<hr id=\"answer\">{{Answer}}",
         }
     ],
-    # standard css for cards generated from this note
-    # TODO allow adding additional css via cli option
-    css="""
-        .card {
-            font-family: 'Crimson Pro', 'Crimson Text', 'Cardo', 'Times', 'serif';
-            text-align: center;
-            color: black;
-            background-color: white;
-        }
-        """,
+    # standard css for cards generated from this note, will be added by the cli
+    css="",
 )
 
 
@@ -44,5 +36,4 @@ class FirstFieldGUIDNote(genanki.Note):
 
 
 DECK_NAME = "manki flashcards"
-# TODO guid based on deck name? hash to int?
-DECK = genanki.Deck(123, DECK_NAME)
+DECK = genanki.Deck(hash(DECK_NAME), DECK_NAME)

@@ -61,6 +61,11 @@ def check_path_is_dir(p: Path):
         raise ValueError(f"Path {p.absolute()} is not a dir.")
 
 
+def read_file_with_default(p: str, default_file: str):
+    file = Path(__file__).parent / default_file if p is None else Path(p)
+    return file.read_text()
+
+
 # TODO q-a delimiters can be set via regex inputs
 def yield_question_and_answer_pairs_from_body(body_text: str):
     question_buffer = []
