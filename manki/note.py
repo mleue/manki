@@ -10,6 +10,7 @@ from .io import (
     filter_paths_by_extension,
 )
 from .html import markdown_to_html, get_img_src_paths, prune_img_src_paths
+from .model import MODEL, FirstFieldGUIDNote
 
 
 class NoteSide:
@@ -52,6 +53,13 @@ class Note:
                 if not p.is_absolute()
             ]
             return abs_paths + rel_paths
+
+    def to_genanki_note(self):
+        return FirstFieldGUIDNote(
+            model=MODEL,
+            fields=[self.q_side.html, self.a_side.html, self.context],
+            tags=self.tags + [self.title],
+        )
 
 
 class NotesFile:

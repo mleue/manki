@@ -4,7 +4,7 @@ import click
 import genanki
 from .io import check_path_exists, check_path_is_dir
 from .note import NotesDirectory, Note
-from .model import MODEL, FirstFieldGUIDNote, DECK
+from .model import DECK
 # TODO add logging
 
 
@@ -35,13 +35,8 @@ def manki_cli(
         notes_path, file_type, tag_whitelist, title_blacklist
     )
     for note in notes_dir.yield_notes():
-        genanki_note = FirstFieldGUIDNote(
-            model=MODEL,
-            fields=[note.q_side.html, note.a_side.html, note.context],
-            tags=note.tags + [note.title],
-        )
         media_file_paths.extend(note.resolve_media_file_paths(media_path))
-        DECK.add_note(genanki_note)
+        DECK.add_note(note.to_genanki_note())
 
     click.echo(media_file_paths)
     pkg = genanki.Package(deck_or_decks=DECK, media_files=media_file_paths)
