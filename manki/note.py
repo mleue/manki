@@ -28,12 +28,14 @@ class Note:
         tags: List[str],
         title: str,
         context: str,
+        origin_note_file_path: Path,
     ):
         self.q_side = q_side
         self.a_side = a_side
         self.tags = tags
         self.title = title
         self.context = context
+        self.origin_note_file_path = origin_note_file_path
 
 
 class NotesFile:
@@ -66,6 +68,7 @@ class NotesFile:
                     self.tags,
                     self.title,
                     self.context,
+                    self.path,
                 )
                 i += 1
         click.echo(f"{i} notes from file {self.path}")
