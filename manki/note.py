@@ -59,6 +59,9 @@ class Note:
             model=MODEL,
             fields=[self.q_side.html, self.a_side.html, self.context],
             tags=self.tags + [self.title],
+            # custom guid, instead of based on all fields (genanki default)
+            # we base it on the markdown of the question
+            guid=genanki.guid_for(self.q_side.markdown),
         )
 
 

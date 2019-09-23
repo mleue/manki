@@ -24,16 +24,5 @@ MODEL = genanki.Model(
     css="",
 )
 
-
-# custom note that uses only the question field for guid generation
-# instead of all fields by default
-# TODO maybe the id should actually not be based on the html question but
-# rather on the original markdown question (less likely to change)
-class FirstFieldGUIDNote(genanki.Note):
-    @property
-    def guid(self):
-        return genanki.guid_for(self.fields[0])
-
-
 DECK_NAME = "manki flashcards"
 DECK = genanki.Deck(hash(DECK_NAME), DECK_NAME)
