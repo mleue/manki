@@ -37,6 +37,22 @@ class Note:
         self.context = context
         self.origin_note_file_path = origin_note_file_path
 
+    def resolve_media_file_paths(self, media_dir_path: Path):
+        # TODO check that paths actually resolve and exist
+        img_paths = self.q_side.img_src_paths + self.a_side.img_src_paths
+        # if media_dir_path is provided, combine that with the filename
+        if media_dir_path is not None:
+            return [media_dir_path / p.name for p in img_paths]
+        # else keep absolute paths, preprend relative ones with note location
+        else:
+            abs_paths = [p for p in img_paths if p.is_absolute()]
+            rel_paths = [
+                (note.origin_note_file_path / ".." / p).resolve()
+                for p in img_paths
+                if not p.is_absolute()
+            ]
+            return abs_paths + rel_paths
+
 
 class NotesFile:
     def __init__(
