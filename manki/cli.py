@@ -12,11 +12,10 @@ from .io import (
     check_path_exists,
     check_path_is_dir,
 )
-from .note import NotesFile, NoteSide
+from .note import NotesFile, NoteSide, NotesDirectory
 from .model import MODEL, FirstFieldGUIDNote, DECK
 
 
-# TODO notify when duplicate questions are encountered
 def generate_cards(
     notes_path: Path,
     out_path: Path,
@@ -25,33 +24,16 @@ def generate_cards(
     title_blacklist: List[str],
     file_type: List[str],
 ):
-    files = yield_files_from_dir_recursively(notes_path)
     img_paths = []
-    questions_set = set()
-    for filepath in filter_paths_by_extension(files, file_type):
-        click.echo(filepath)
-        notes_file = NotesFile(
-            filepath,
-            tag_whitelist=tag_whitelist,
-            title_blacklist=title_blacklist,
+    notes_dir = NotesDirectory(notes_path, file_type, tag_whitelist, title_blacklist)
+    for note in notes_dir.yield_notes():
+        img_paths.extend(note.q_side.img_src_paths + note.a_side.img_src_paths)
+        genanki_note = FirstFieldGUIDNote(
+            model=MODEL,
+            fields=[note.q_side.html, note.a_side.html, note.context],
+            tags=note.tags + [note.title],
         )
-        i = 0
-        for q_side, a_side in notes_file.yield_qa_pairs():
-            # TODO make this part of a NotesDirectory class
-            if q_side.markdown in questions_set:
-                click.echo(f"Duplicate question encountered {q_side.markdown}. Disregarding.")
-                continue
-            else:
-                questions_set.add(q_side.markdown)
-            img_paths.extend(q_side.img_src_paths + a_side.img_src_paths)
-            note = FirstFieldGUIDNote(
-                model=MODEL,
-                fields=[q_side.html, a_side.html, notes_file.context],
-                tags=notes_file.tags + [notes_file.title],
-            )
-            DECK.add_note(note)
-            i += 1
-        click.echo(f"{i} notes from file {filepath}")
+        DECK.add_note(genanki_note)
 
     # TODO check that paths actually resolve and exist
     # if media path is provided, combine that path with each img_paths filename
