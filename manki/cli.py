@@ -47,15 +47,13 @@ def manki_cli(
     d = NotesDirectory(notes_path, file_type)
     notes = []
     for notes_file in d.yield_note_files():
-        notes = [
-            note
-            for note in notes_file.yield_notes(
-                tag_whitelist,
-                title_blacklist,
-                question_regex,
-                question_regex_removal,
-            )
-        ]
+        for note in notes_file.yield_notes(
+            tag_whitelist,
+            title_blacklist,
+            question_regex,
+            question_regex_removal,
+        ):
+            notes.append(note)
 
     # deduplication
     deduplicator = Deduplicator(entity_type="question")
