@@ -43,6 +43,7 @@ class Note:
         self.context = context
         self.origin_note_file_path = origin_note_file_path
 
+    # TODO refactor this out into a media resolver class
     def resolve_media_file_paths(self, media_dir_path: Path):
         # TODO check that paths actually resolve and exist
         img_paths = self.q_side.img_src_paths + self.a_side.img_src_paths

@@ -1,7 +1,16 @@
+import click
 from typing import List
 from pathlib import Path
 import re
 import yaml
+import genanki
+
+
+def save_as_package(out_path, deck, media_file_paths):
+    click.echo(media_file_paths)
+    out_path = Path(out_path) if out_path is not None else Path.cwd()
+    pkg = genanki.Package(deck_or_decks=deck, media_files=media_file_paths)
+    pkg.write_to_file(out_path / "genanki.apkg")
 
 
 def yield_files_from_dir_recursively(base_dir: Path):
@@ -77,6 +86,7 @@ def yield_question_and_answer_pairs_from_body(
         if not line:
             continue
         for matcher, remove_matcher in matchers:
+            matcher = rf"{matcher}"
             if is_question(line, matcher):
                 if remove_matcher:
                     line = re.sub(matcher, r"\1", line)

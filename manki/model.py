@@ -24,5 +24,6 @@ MODEL = genanki.Model(
     css="",
 )
 
+# TODO be able to set via CLI
 DECK_NAME = "manki flashcards"
 DECK = genanki.Deck(hash(DECK_NAME), DECK_NAME)

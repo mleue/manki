@@ -2,7 +2,7 @@ from typing import List
 from pathlib import Path
 import click
 import genanki
-from .io import read_file_with_default
+from .io import read_file_with_default, save_as_package
 from .note import NotesDirectory, Note, TIME_OF_RUN
 from .model import DECK, MODEL
 from .duplicate import Deduplicator
@@ -21,8 +21,10 @@ file_path_type = click.Path(exists=True, file_okay=True)
 @click.option("-f", "--file-type", type=str, default=(".md",), multiple=True)
 @click.option("-c", "--css-file", type=file_path_type, default=None)
 @click.option("-p", "--pygments-css-file", type=file_path_type, default=None)
-@click.option("-q", "--question-regex", type=str, default=(r"(.*\?)$", ))
-@click.option("-r", "--question-regex-removal", type=str, default=(r"^\?(.*)", ))
+@click.option("-q", "--question-regex", type=str, default=(r"(.*\?)$",))
+@click.option(
+    "-r", "--question-regex-removal", type=str, default=(r"^\?(.*)",)
+)
 def manki_cli(
     notes_path,
     out_path,
@@ -35,8 +37,6 @@ def manki_cli(
     question_regex,
     question_regex_removal,
 ):
-    click.echo(question_regex)
-    click.echo(question_regex_removal)
     # load resources
     MODEL.css += read_file_with_default(css_file, "style.css")
     MODEL.css += read_file_with_default(pygments_css_file, "pygments.css")
@@ -54,16 +54,14 @@ def manki_cli(
             question_regex,
             question_regex_removal,
         ):
-            if not deduplicator.is_duplicate(note, str(notes_file.path)):
+            if not deduplicator.is_duplicate(
+                note, str(note.origin_note_file_path)
+            ):
                 media_file_paths.extend(
                     note.resolve_media_file_paths(media_path)
                 )
                 DECK.add_note(note.to_genanki_note())
 
-    # create and save a package
-    click.echo(media_file_paths)
-    out_path = Path(out_path) if out_path is not None else Path.cwd()
-    pkg = genanki.Package(deck_or_decks=DECK, media_files=media_file_paths)
-    pkg.write_to_file(out_path / "genanki.apkg")
+    save_as_package(out_path, DECK, media_file_paths)
     click.echo(f"{len(deduplicator.entities)} notes put into the package.")
     click.echo(f"time tag for this run: {TIME_OF_RUN}")
