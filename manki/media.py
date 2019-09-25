@@ -26,7 +26,7 @@ def resolve_media_file_paths(notes: List[Note], media_path: Path):
         else:
             abs_paths = [p for p in img_paths if p.is_absolute()]
             rel_paths = [
-                (note.origin_note_file_path / ".." / p).resolve()
+                (note.path / ".." / p).resolve()
                 for p in img_paths
                 if not p.is_absolute()
             ]

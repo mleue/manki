@@ -43,14 +43,14 @@ class Note:
         tags: List[str],
         title: str,
         context: str,
-        origin_note_file_path: Path,
+        path: Path,
     ):
         self.q_side = q_side
         self.a_side = a_side
         self.tags = tags
         self.title = title
         self.context = context
-        self.origin_note_file_path = origin_note_file_path
+        self.path = path
 
     def to_genanki_note(self):
         return genanki.Note(
@@ -80,7 +80,7 @@ class NotesFile:
         self.frontmatter = resolve_nested_tags(self.frontmatter)
         self.tags = self.frontmatter["tags"]
         self.title = self.frontmatter["title"].replace(" ", "_")
-        self.context = self._build_context()
+        self.context = f"{self.tags[-1]}, {self.title}"
 
     def yield_notes(
         self,
@@ -89,14 +89,10 @@ class NotesFile:
         question_regex: List[str],
         question_regex_removal: List[str],
     ):
-        i = 0
-        if self._has_whitelist_tags(
-            tag_whitelist
-        ) and self._title_is_not_blacklisted(title_blacklist):
+        if self.use_file(tag_whitelist, title_blacklist):
+            i = 0
             for q_md, a_md in yield_question_and_answer_pairs_from_body(
-                self.body_text,
-                question_regex,
-                question_regex_removal,
+                self.body_text, question_regex, question_regex_removal
             ):
                 yield Note(
                     NoteSide(q_md),
@@ -107,15 +103,19 @@ class NotesFile:
                     self.path,
                 )
                 i += 1
-        click.echo(f"{i} notes found in file {self.path}")
+            click.echo(f"{i} notes found in file {self.path}.")
+        else:
+            click.echo(f"Disregarding file {self.path}.")
 
-    def _build_context(self) -> str:
-        return f"{self.tags[-1]}, {self.title}"
+    def use_file(self, tag_whitelist: List[str], title_blacklist: List[str]):
+        return self.has_whitelist_tags(
+            tag_whitelist
+        ) and self.title_is_not_blacklisted(title_blacklist)
 
-    def _has_whitelist_tags(self, tag_whitelist: List[str]):
+    def has_whitelist_tags(self, tag_whitelist: List[str]):
         return tag_whitelist and set(tag_whitelist).intersection(self.tags)
 
-    def _title_is_not_blacklisted(self, title_blacklist: List[str]):
+    def title_is_not_blacklisted(self, title_blacklist: List[str]):
         return self.title not in title_blacklist
 
 

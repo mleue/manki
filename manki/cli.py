@@ -42,26 +42,32 @@ def manki_cli(
     MODEL.css += read_file_with_default(css_file, "style.css")
     MODEL.css += read_file_with_default(pygments_css_file, "pygments.css")
 
-    # generate cards and add to deck
+    # generate notes
     notes_path = Path(notes_path)
     d = NotesDirectory(notes_path, file_type)
-    deduplicator = Deduplicator(entity_type="question")
     notes = []
     for notes_file in d.yield_note_files():
-        for note in notes_file.yield_notes(
-            tag_whitelist,
-            title_blacklist,
-            question_regex,
-            question_regex_removal,
-        ):
-            if not deduplicator.is_duplicate(
-                note, str(note.origin_note_file_path)
-            ):
-                notes.append(note)
-                DECK.add_note(note.to_genanki_note())
+        notes = [
+            note
+            for note in notes_file.yield_notes(
+                tag_whitelist,
+                title_blacklist,
+                question_regex,
+                question_regex_removal,
+            )
+        ]
 
+    # deduplication
+    deduplicator = Deduplicator(entity_type="question")
+    notes = [n for n in notes if not deduplicator.is_duplicate(n, n.path)]
+
+    # media file path resolver
     media_file_paths = resolve_media_file_paths(notes, media_path)
 
+    # add to deck
+    for note in notes:
+        DECK.add_note(note.to_genanki_note())
+
     save_as_package(out_path, DECK, media_file_paths)
-    click.echo(f"{len(deduplicator.entities)} notes put into the package.")
+    click.echo(f"{len(DECK.notes)} notes put into the package.")
     click.echo(f"time tag for this run: {TIME_OF_RUN}")
