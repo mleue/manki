@@ -6,6 +6,7 @@ from .io import read_file_with_default, save_as_package
 from .note import NotesDirectory, Note, TIME_OF_RUN
 from .model import DECK, MODEL
 from .duplicate import Deduplicator
+from .media import resolve_media_file_paths
 
 # TODO add logging
 dir_path_type = click.Path(exists=True, file_okay=False)
@@ -43,10 +44,9 @@ def manki_cli(
 
     # generate cards and add to deck
     notes_path = Path(notes_path)
-    media_path = Path(media_path) if media_path is not None else media_path
-    media_file_paths = []
     d = NotesDirectory(notes_path, file_type)
     deduplicator = Deduplicator(entity_type="question")
+    notes = []
     for notes_file in d.yield_note_files():
         for note in notes_file.yield_notes(
             tag_whitelist,
@@ -57,10 +57,10 @@ def manki_cli(
             if not deduplicator.is_duplicate(
                 note, str(note.origin_note_file_path)
             ):
-                media_file_paths.extend(
-                    note.resolve_media_file_paths(media_path)
-                )
+                notes.append(note)
                 DECK.add_note(note.to_genanki_note())
+
+    media_file_paths = resolve_media_file_paths(notes, media_path)
 
     save_as_package(out_path, DECK, media_file_paths)
     click.echo(f"{len(deduplicator.entities)} notes put into the package.")

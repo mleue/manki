@@ -25,6 +25,15 @@ class NoteSide:
         self.img_src_paths = list(get_img_src_paths(self.html))
         self.html = prune_img_src_paths(self.html)
 
+    def __hash__(self):
+        return hash(self.markdown)
+
+    def __eq__(self, other):
+        return self.markdown == other.markdown
+
+    def __str__(self):
+        return f"{self.markdown}"
+
 
 class Note:
     def __init__(
@@ -43,23 +52,6 @@ class Note:
         self.context = context
         self.origin_note_file_path = origin_note_file_path
 
-    # TODO refactor this out into a media resolver class
-    def resolve_media_file_paths(self, media_dir_path: Path):
-        # TODO check that paths actually resolve and exist
-        img_paths = self.q_side.img_src_paths + self.a_side.img_src_paths
-        # if media_dir_path is provided, combine that with the filename
-        if media_dir_path is not None:
-            return [media_dir_path / p.name for p in img_paths]
-        # else keep absolute paths, preprend relative ones with note location
-        else:
-            abs_paths = [p for p in img_paths if p.is_absolute()]
-            rel_paths = [
-                (note.origin_note_file_path / ".." / p).resolve()
-                for p in img_paths
-                if not p.is_absolute()
-            ]
-            return abs_paths + rel_paths
-
     def to_genanki_note(self):
         return genanki.Note(
             model=MODEL,
@@ -71,13 +63,13 @@ class Note:
         )
 
     def __hash__(self):
-        return hash(self.q_side.markdown)
+        return hash(self.q_side)
 
     def __eq__(self, other):
-        return self.q_side.markdown == other.q_side.markdown
+        return self.q_side == other.q_side
 
     def __str__(self):
-        return f"Note('{self.q_side.markdown}')"
+        return f"Note('{self.q_side}')"
 
 
 class NotesFile:
