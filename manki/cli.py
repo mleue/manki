@@ -21,8 +21,8 @@ file_path_type = click.Path(exists=True, file_okay=True)
 @click.option("-f", "--file-type", type=str, default=(".md",), multiple=True)
 @click.option("-c", "--css-file", type=file_path_type, default=None)
 @click.option("-p", "--pygments-css-file", type=file_path_type, default=None)
-@click.option("-q", "--question-regex", type=str, default=r"(.*\?)$")
-@click.option("-r", "--question-regex-removal", type=str, default=r"^\?(.*)")
+@click.option("-q", "--question-regex", type=str, default=(r"(.*\?)$", ))
+@click.option("-r", "--question-regex-removal", type=str, default=(r"^\?(.*)", ))
 def manki_cli(
     notes_path,
     out_path,
@@ -35,8 +35,8 @@ def manki_cli(
     question_regex,
     question_regex_removal,
 ):
-    click.echo(tag_whitelist)
-    click.echo(title_blacklist)
+    click.echo(question_regex)
+    click.echo(question_regex_removal)
     # load resources
     MODEL.css += read_file_with_default(css_file, "style.css")
     MODEL.css += read_file_with_default(pygments_css_file, "pygments.css")
@@ -48,7 +48,12 @@ def manki_cli(
     d = NotesDirectory(notes_path, file_type)
     deduplicator = Deduplicator(entity_type="question")
     for notes_file in d.yield_note_files():
-        for note in notes_file.yield_notes(tag_whitelist, title_blacklist):
+        for note in notes_file.yield_notes(
+            tag_whitelist,
+            title_blacklist,
+            question_regex,
+            question_regex_removal,
+        ):
             if not deduplicator.is_duplicate(note, str(notes_file.path)):
                 media_file_paths.extend(
                     note.resolve_media_file_paths(media_path)

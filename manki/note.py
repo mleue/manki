@@ -90,14 +90,20 @@ class NotesFile:
         self.context = self._build_context()
 
     def yield_notes(
-        self, tag_whitelist: List[str], title_blacklist: List[str]
+        self,
+        tag_whitelist: List[str],
+        title_blacklist: List[str],
+        question_regex: List[str],
+        question_regex_removal: List[str],
     ):
         i = 0
         if self._has_whitelist_tags(
             tag_whitelist
         ) and self._title_is_not_blacklisted(title_blacklist):
             for q_md, a_md in yield_question_and_answer_pairs_from_body(
-                self.body_text
+                self.body_text,
+                question_regex,
+                question_regex_removal,
             ):
                 yield Note(
                     NoteSide(q_md),

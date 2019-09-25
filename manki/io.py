@@ -66,9 +66,11 @@ def read_file_with_default(p: str, default_file: str):
     return file.read_text()
 
 
-# TODO matchers can be set via regex inputs
-def yield_question_and_answer_pairs_from_body(body_text: str):
-    matchers = [(r"(.*\?)$", False), (r"^\?(.*)", True)]
+def yield_question_and_answer_pairs_from_body(
+    body_text: str, matchers_no_removal: List[str], matchers_removal: List[str]
+):
+    matchers = [(m, False) for m in matchers_no_removal]
+    matchers += [(m, True) for m in matchers_removal]
     question_buffer = []
     answer_buffer = []
     for line in body_text.strip().split("\n"):
