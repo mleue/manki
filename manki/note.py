@@ -1,5 +1,6 @@
 from typing import List
 from pathlib import Path
+import time
 import click
 import genanki
 from .io import (
@@ -12,6 +13,9 @@ from .io import (
 )
 from .html import markdown_to_html, get_img_src_paths, prune_img_src_paths
 from .model import MODEL
+
+
+TIME_OF_RUN = int(time.time())
 
 
 class NoteSide:
@@ -59,32 +63,42 @@ class Note:
         return genanki.Note(
             model=MODEL,
             fields=[self.q_side.html, self.a_side.html, self.context],
-            tags=self.tags + [self.title],
+            tags=self.tags + [self.title] + [str(TIME_OF_RUN)],
             # custom guid, instead of based on all fields (genanki default)
             # we base it on the markdown of the question
             guid=genanki.guid_for(self.q_side.markdown),
         )
+
+    def __hash__(self):
+        return hash(self.q_side.markdown)
+
+    def __eq__(self, other):
+        return self.q_side.markdown == other.q_side.markdown
+
+    def __str__(self):
+        return f"Note('{self.q_side.markdown}')"
 
 
 class NotesFile:
     def __init__(
         self,
         note_file_path: Path,
-        tag_whitelist: List[str],
-        title_blacklist: List[str],
+        tag_whitelist: List[str] = None,
+        title_blacklist: List[str] = None,
     ):
         self.path = note_file_path
         self.front_text, self.body_text = get_frontmatter_and_body(self.path)
         self.frontmatter = parse_frontmatter(self.front_text)
         self.frontmatter = resolve_nested_tags(self.frontmatter)
         self.tags = self.frontmatter["tags"]
-        self.title = self.frontmatter["title"]
-        self.tag_whitelist = tag_whitelist
-        self.title_blacklist = title_blacklist
+        self.title = self.frontmatter["title"].replace(" ", "_")
+        self.tag_whitelist = [] if tag_whitelist is None else tag_whitelist
+        self.title_blacklist = (
+            [] if title_blacklist is None else title_blacklist
+        )
         self.context = self._build_context()
 
     def yield_notes(self):
-        click.echo(self.path)
         i = 0
         if self._use_notes_from_this_file():
             for q_md, a_md in yield_question_and_answer_pairs_from_body(
@@ -99,7 +113,7 @@ class NotesFile:
                     self.path,
                 )
                 i += 1
-        click.echo(f"{i} notes from file {self.path}")
+        click.echo(f"{i} notes found in file {self.path}")
 
     def _build_context(self) -> str:
         return f"{self.tags[-1]}, {self.title}"
@@ -121,40 +135,10 @@ class NotesDirectory:
         self,
         notes_dir_path: Path,
         file_type: List[str],
-        tag_whitelist: List[str],
-        title_blacklist: List[str],
     ):
         self.path = notes_dir_path
         self.file_type = file_type
-        self.tag_whitelist = [] if tag_whitelist is None else tag_whitelist
-        self.title_blacklist = (
-            [] if title_blacklist is None else title_blacklist
-        )
-        self.questions = dict()
 
-    # TODO yield only filepaths here
-    def yield_notes(self):
+    def yield_filepaths(self):
         files = yield_files_from_dir_recursively(self.path)
-        for filepath in filter_paths_by_extension(files, self.file_type):
-            notes_file = NotesFile(
-                filepath,
-                tag_whitelist=self.tag_whitelist,
-                title_blacklist=self.title_blacklist,
-            )
-            for note in notes_file.yield_notes():
-                if self._is_duplicate_question(note):
-                    continue
-                else:
-                    yield note
-
-    def _is_duplicate_question(self, note: Note):
-        # TODO check against hash here
-        if note.q_side.markdown in self.questions:
-            l1 = f"Duplicate question encountered: '{note.q_side.markdown}'."
-            initial_file_occurence = self.questions[note.q_side.markdown]
-            l2 = f"First seen in file '{initial_file_occurence}'."
-            l3 = "Disregarding."
-            click.echo(f"{l1}\n{l2}\n{l3}")
-            return True
-        else:
-            return False
+        yield from filter_paths_by_extension(files, self.file_type)

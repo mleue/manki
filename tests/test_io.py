@@ -68,7 +68,6 @@ def test_detect_question():
 def test_yield_question_and_answer_pairs_from_body(datadir):
     _, body = get_frontmatter_and_body(datadir / "test.md")
     pairs = list(yield_question_and_answer_pairs_from_body(body))
-    print(pairs)
     assert len(pairs) == 5
     assert pairs[0][0] == "what is `dmesg`?"
     assert pairs[1][1] == "`dmesg --follow`"
