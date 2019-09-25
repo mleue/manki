@@ -1,5 +1,5 @@
 ---
-title: test
+title: test notes
 tags: [Notebooks/flashcards/learning/unix]
 ---
 

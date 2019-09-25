@@ -30,7 +30,7 @@ def test_filter_paths_by_extension(datadir, extensions, exp_files):
 
 
 def test_get_frontmatter_and_body(datadir):
-    front = "title: test\ntags: [Notebooks/flashcards/learning/unix]\n"
+    front = "title: test notes\ntags: [Notebooks/flashcards/learning/unix]\n"
     frontmatter, body = get_frontmatter_and_body(datadir / "test.md")
     assert front == frontmatter
     assert body[:4] == "\n# t"
@@ -39,7 +39,7 @@ def test_get_frontmatter_and_body(datadir):
 
 def test_parse_frontmatter(datadir):
     expected = {
-        "title": "test",
+        "title": "test notes",
         "tags": ["Notebooks/flashcards/learning/unix"],
     }
     frontmatter_text, _ = get_frontmatter_and_body(datadir / "test.md")
@@ -49,7 +49,7 @@ def test_parse_frontmatter(datadir):
 
 def test_resolve_nested_tags(datadir):
     expected = {
-        "title": "test",
+        "title": "test notes",
         "tags": ["Notebooks", "flashcards", "learning", "unix"],
     }
     frontmatter_text, _ = get_frontmatter_and_body(datadir / "test.md")
