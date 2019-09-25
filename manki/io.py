@@ -95,5 +95,5 @@ def yield_question_and_answer_pairs_from_body(
             if question_buffer:
                 answer_buffer.append(line)
     # flush out the last qa pair
-    if question_buffer is not None:
+    if question_buffer:
         yield "\n".join(question_buffer), "\n".join(answer_buffer)

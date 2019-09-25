@@ -23,3 +23,43 @@ def test_notes_file_parses_frontmatter_correctly(notes_file: NotesFile):
     assert notes_file.title == "test_notes"
     assert notes_file.tags == ["Notebooks", "flashcards", "learning", "unix"]
     assert notes_file.context == "unix, test_notes"
+
+
+def test_notes_file_yield_notes_no_tag_whitelist(notes_file: NotesFile):
+    question_regex, question_regex_removal = [r"(.*\?)$"], [r"^\?(.*)"]
+    tag_whitelist, title_blacklist = [], []
+    notes = notes_file.yield_notes(
+        tag_whitelist, title_blacklist, question_regex, question_regex_removal
+    )
+    # no notes without a tag_whitelist
+    assert len(list(notes)) == 0
+
+
+def test_notes_file_yield_notes_title_blacklisted(notes_file: NotesFile):
+    question_regex, question_regex_removal = [r"(.*\?)$"], [r"^\?(.*)"]
+    tag_whitelist, title_blacklist = [], ["test_notes"]
+    notes = notes_file.yield_notes(
+        tag_whitelist, title_blacklist, question_regex, question_regex_removal
+    )
+    # no notes if title is blacklisted
+    assert len(list(notes)) == 0
+
+
+def test_notes_file_yield_notes(notes_file: NotesFile):
+    question_regex, question_regex_removal = [r"(.*\?)$"], [r"^\?(.*)"]
+    tag_whitelist, title_blacklist = ["flashcards"], []
+    notes = notes_file.yield_notes(
+        tag_whitelist, title_blacklist, question_regex, question_regex_removal
+    )
+    # all notes if tags whitelisted and title not blacklisted
+    assert len(list(notes)) == 5
+
+
+def test_notes_file_yield_notes_no_question_found(notes_file: NotesFile):
+    question_regex, question_regex_removal = [r"(.*!)$"], []
+    tag_whitelist, title_blacklist = ["flashcards"], []
+    notes = notes_file.yield_notes(
+        tag_whitelist, title_blacklist, question_regex, question_regex_removal
+    )
+    # no notes if the regex doesn't find any questions
+    assert len(list(notes)) == 0
