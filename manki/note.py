@@ -80,27 +80,22 @@ class Note:
 
 
 class NotesFile:
-    def __init__(
-        self,
-        note_file_path: Path,
-        tag_whitelist: List[str] = None,
-        title_blacklist: List[str] = None,
-    ):
+    def __init__(self, note_file_path: Path):
         self.path = note_file_path
         self.front_text, self.body_text = get_frontmatter_and_body(self.path)
         self.frontmatter = parse_frontmatter(self.front_text)
         self.frontmatter = resolve_nested_tags(self.frontmatter)
         self.tags = self.frontmatter["tags"]
         self.title = self.frontmatter["title"].replace(" ", "_")
-        self.tag_whitelist = [] if tag_whitelist is None else tag_whitelist
-        self.title_blacklist = (
-            [] if title_blacklist is None else title_blacklist
-        )
         self.context = self._build_context()
 
-    def yield_notes(self):
+    def yield_notes(
+        self, tag_whitelist: List[str], title_blacklist: List[str]
+    ):
         i = 0
-        if self._use_notes_from_this_file():
+        if self._has_whitelist_tags(
+            tag_whitelist
+        ) and self._title_is_not_blacklisted(title_blacklist):
             for q_md, a_md in yield_question_and_answer_pairs_from_body(
                 self.body_text
             ):
@@ -118,27 +113,20 @@ class NotesFile:
     def _build_context(self) -> str:
         return f"{self.tags[-1]}, {self.title}"
 
-    def _use_notes_from_this_file(self):
-        return self._has_whitelist_tags() and self._title_is_not_blacklisted()
+    def _has_whitelist_tags(self, tag_whitelist: List[str]):
+        return tag_whitelist and set(tag_whitelist).intersection(self.tags)
 
-    def _has_whitelist_tags(self):
-        return self.tag_whitelist and set(self.tag_whitelist).intersection(
-            self.frontmatter["tags"]
-        )
-
-    def _title_is_not_blacklisted(self):
-        return not self.frontmatter["title"] in self.title_blacklist
+    def _title_is_not_blacklisted(self, title_blacklist: List[str]):
+        return self.title not in title_blacklist
 
 
 class NotesDirectory:
-    def __init__(
-        self,
-        notes_dir_path: Path,
-        file_type: List[str],
-    ):
+    def __init__(self, notes_dir_path: Path, file_type: List[str]):
         self.path = notes_dir_path
         self.file_type = file_type
 
-    def yield_filepaths(self):
+    def yield_note_files(self):
         files = yield_files_from_dir_recursively(self.path)
-        yield from filter_paths_by_extension(files, self.file_type)
+        for filepath in filter_paths_by_extension(files, self.file_type):
+            notes_file = NotesFile(filepath)
+            yield notes_file

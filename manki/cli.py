@@ -3,7 +3,7 @@ from pathlib import Path
 import click
 import genanki
 from .io import read_file_with_default
-from .note import NotesDirectory, Note, TIME_OF_RUN, NotesFile
+from .note import NotesDirectory, Note, TIME_OF_RUN
 from .model import DECK, MODEL
 from .duplicate import Deduplicator
 
@@ -35,6 +35,8 @@ def manki_cli(
     question_regex,
     question_regex_removal,
 ):
+    click.echo(tag_whitelist)
+    click.echo(title_blacklist)
     # load resources
     MODEL.css += read_file_with_default(css_file, "style.css")
     MODEL.css += read_file_with_default(pygments_css_file, "pygments.css")
@@ -45,14 +47,9 @@ def manki_cli(
     media_file_paths = []
     d = NotesDirectory(notes_path, file_type)
     deduplicator = Deduplicator(entity_type="question")
-    for filepath in d.yield_filepaths():
-        notes_file = NotesFile(
-            filepath,
-            tag_whitelist=tag_whitelist,
-            title_blacklist=title_blacklist,
-        )
-        for note in notes_file.yield_notes():
-            if not deduplicator.is_duplicate(note, str(filepath)):
+    for notes_file in d.yield_note_files():
+        for note in notes_file.yield_notes(tag_whitelist, title_blacklist):
+            if not deduplicator.is_duplicate(note, str(notes_file.path)):
                 media_file_paths.extend(
                     note.resolve_media_file_paths(media_path)
                 )
