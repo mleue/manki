@@ -65,4 +65,5 @@ def manki_cli(
     out_path = Path(out_path) if out_path is not None else Path.cwd()
     pkg = genanki.Package(deck_or_decks=DECK, media_files=media_file_paths)
     pkg.write_to_file(out_path / "genanki.apkg")
+    click.echo(f"{len(deduplicator.entities)} notes put into the package.")
     click.echo(f"time tag for this run: {TIME_OF_RUN}")
