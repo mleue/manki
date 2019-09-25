@@ -1,5 +1,5 @@
 import pytest
-from manki.note import NotesDirectory, NotesFile
+from manki.note import NotesDirectory, NotesFile, Note, NoteSide
 
 
 @pytest.fixture
@@ -63,3 +63,31 @@ def test_notes_file_yield_notes_no_question_found(notes_file: NotesFile):
     )
     # no notes if the regex doesn't find any questions
     assert len(list(notes)) == 0
+
+
+@pytest.fixture
+def note(notes_file):
+    question_regex, question_regex_removal = [r"(.*\?)$"], [r"^\?(.*)"]
+    tag_whitelist, title_blacklist = ["flashcards"], []
+    notes = notes_file.yield_notes(
+        tag_whitelist, title_blacklist, question_regex, question_regex_removal
+    )
+    yield list(notes)[0]
+
+
+def test_note_attributes(notes_file: NotesFile, note: Note):
+    assert note.path == notes_file.path
+    assert note.tags == notes_file.tags
+    assert note.title == notes_file.title
+    assert note.context == notes_file.context
+    assert note.q_side.markdown == "what is `dmesg`?"
+    assert note.a_side.markdown[-6:] == "kernel"
+
+
+def test_note_hashes_and_compares_equal():
+    n1 = Note(NoteSide("a"), NoteSide("b"), ["tag"], "title", "con", "path")
+    # different except for markdown question side
+    n2 = Note(NoteSide("a"), NoteSide("c"), ["t2"], "t2", "con2", "path2")
+    assert n1 == n2
+    assert hash(n1) == hash(n2)
+    assert len(set((n1, n2))) == 1

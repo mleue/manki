@@ -31,7 +31,7 @@ class NoteSide:
     def __eq__(self, other):
         return self.markdown == other.markdown
 
-    def __str__(self):
+    def __repr__(self):
         return f"{self.markdown}"
 
 
@@ -68,7 +68,7 @@ class Note:
     def __eq__(self, other):
         return self.q_side == other.q_side
 
-    def __str__(self):
+    def __repr__(self):
         return f"Note('{self.q_side}')"
 
 
