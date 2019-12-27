@@ -52,7 +52,7 @@ def test_notes_file_yield_notes(notes_file: NotesFile):
         tag_whitelist, title_blacklist, question_regex, question_regex_removal
     )
     # all notes if tags whitelisted and title not blacklisted
-    assert len(list(notes)) == 5
+    assert len(list(notes)) == 6
 
 
 def test_notes_file_yield_notes_no_question_found(notes_file: NotesFile):
@@ -72,7 +72,7 @@ def note(notes_file):
     notes = notes_file.yield_notes(
         tag_whitelist, title_blacklist, question_regex, question_regex_removal
     )
-    yield list(notes)[0]
+    yield list(notes)[5]
 
 
 def test_note_attributes(notes_file: NotesFile, note: Note):
@@ -80,8 +80,9 @@ def test_note_attributes(notes_file: NotesFile, note: Note):
     assert note.tags == notes_file.tags
     assert note.title == notes_file.title
     assert note.context == notes_file.context
-    assert note.q_side.markdown == "what is `dmesg`?"
-    assert note.a_side.markdown[-6:] == "kernel"
+    assert note.q_side.markdown == "easiest way to set the http response and/or headers manually?"
+    assert note.a_side.markdown[-3:] == "```"
+    assert note.a_side.html == '<ul>\n<li>return a tuple from an endpoint</li>\n</ul>\n<table class="codehilitetable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="n">test</span> <span class="o">=</span> <span class="n">a</span>\n</pre></div>\n</td></tr></tbody></table>'
 
 
 def test_note_hashes_and_compares_equal():

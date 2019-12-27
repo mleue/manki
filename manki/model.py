@@ -2,7 +2,8 @@ import genanki
 
 MODEL_NAME = "manki model"
 MODEL = genanki.Model(
-    genanki.guid_for(MODEL_NAME),
+    # abs(hash(MODEL_NAME)),
+    1150204890,
     MODEL_NAME,
     fields=[
         # three fields: a question, an answer, a context tag
@@ -24,6 +25,7 @@ MODEL = genanki.Model(
     css="",
 )
 
+
 # TODO be able to set via CLI
 DECK_NAME = "manki flashcards"
-DECK = genanki.Deck(hash(DECK_NAME), DECK_NAME)
+DECK = genanki.Deck(1989074340, DECK_NAME)

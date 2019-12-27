@@ -47,6 +47,7 @@ def manki_cli(
     d = NotesDirectory(notes_path, file_type)
     notes = []
     for notes_file in d.yield_note_files():
+        print(notes_file.path)
         for note in notes_file.yield_notes(
             tag_whitelist,
             title_blacklist,

@@ -23,4 +23,5 @@ def prune_img_src_paths(html: str):
         if "src" in node.attributes:
             path = Path(node.attributes["src"])
             node.attrs["src"] = path.name
-    return tree.body.child.html
+    html = "\n<br/>\n".join([c.html for c in tree.body.iter()])
+    return html

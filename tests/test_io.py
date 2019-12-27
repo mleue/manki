@@ -34,7 +34,7 @@ def test_get_frontmatter_and_body(datadir):
     frontmatter, body = get_frontmatter_and_body(datadir / "test.md")
     assert front == frontmatter
     assert body[:4] == "\n# t"
-    assert body[-4:] == "wer\n"
+    assert body[-4:] == "```\n"
 
 
 def test_parse_frontmatter(datadir):
@@ -70,9 +70,10 @@ def test_yield_question_and_answer_pairs_from_body(datadir):
     matchers_no_removal = [r"(.*\?)$"]
     matchers_removal = [r"^\?(.*)"]
     pairs = list(yield_question_and_answer_pairs_from_body(body, matchers_no_removal, matchers_removal))
-    assert len(pairs) == 5
+    assert len(pairs) == 6
     assert pairs[0][0] == "what is `dmesg`?"
     assert pairs[1][1] == "`dmesg --follow`"
     assert pairs[2][0] == "is it possible to use python here as well?"
     assert pairs[2][1][-3:] == "```"
     assert pairs[4][0] == "how about double line questions?\nhere comes the second line"
+    assert pairs[5][1][-3:] == "```"
