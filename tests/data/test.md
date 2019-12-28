@@ -15,7 +15,7 @@ how about double line questions?
 ?here comes the second line
 - answer
 
-how about mathjax latex $\vec{a}$?
+how about mathjax latex $\vec{a}$ and $\vec{b}$?
 $$\begin{bmatrix}a&b\\c&d\end{bmatrix}$$
 
 is it possible to use python here as well?

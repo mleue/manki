@@ -14,8 +14,8 @@ def markdown_to_html(markdown_text: str):
         extension_configs={"codehilite": {"linenums": True}},
     )
     # TODO fix hacky replace of $eq$ or $$eq$$ tags
-    html = re.sub(r"\$\$(.*)\$\$", r"\\[\1\\]", html)
-    html = re.sub(r"\$(.*)\$", r"\\(\1\\)", html)
+    html = re.sub(r"\$\$(.*?)\$\$", r"\\[\1\\]", html)
+    html = re.sub(r"\$(.*?)\$", r"\\(\1\\)", html)
     return html
 
 

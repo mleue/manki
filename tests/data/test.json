@@ -26,9 +26,9 @@
 	{
 		"title": "test_notes",
 		"tags": ["flashcards", "learning", "unix"],
-		"q_markdown": "how about mathjax latex $\\vec{a}$?",
+		"q_markdown": "how about mathjax latex $\\vec{a}$ and $\\vec{b}$?",
 		"a_markdown": "$$\\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}$$",
-		"q_html": "<p>how about mathjax latex \\(\\vec{a}\\)?</p>",
+		"q_html": "<p>how about mathjax latex \\(\\vec{a}\\) and \\(\\vec{b}\\)?</p>",
 		"a_html": "<p>\\[\\begin{bmatrix}a&amp;b\\\\c&amp;d\\end{bmatrix}\\]</p>"
 	},
 	{
