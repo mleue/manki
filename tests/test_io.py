@@ -11,7 +11,11 @@ from manki.io import (
 
 
 def test_get_files_from_dir_recursively(datadir):
-    expected = [datadir / "test.txt", datadir / "test.md"]
+    expected = [
+        datadir / "test.txt",
+        datadir / "test.md",
+        datadir / "test.json",
+    ]
     assert expected == list(yield_files_from_dir_recursively(datadir))
 
 
@@ -20,7 +24,7 @@ def test_get_files_from_dir_recursively(datadir):
     [
         ([".md"], ["test.md"]),
         ([".txt"], ["test.txt"]),
-        ([], ["test.txt", "test.md"]),
+        ([], ["test.txt", "test.md", "test.json"]),
     ],
 )
 def test_filter_paths_by_extension(datadir, extensions, exp_files):
@@ -69,11 +73,16 @@ def test_yield_question_and_answer_pairs_from_body(datadir):
     _, body = get_frontmatter_and_body(datadir / "test.md")
     matchers_no_removal = [r"(.*\?)$"]
     matchers_removal = [r"^\?(.*)"]
-    pairs = list(yield_question_and_answer_pairs_from_body(body, matchers_no_removal, matchers_removal))
-    assert len(pairs) == 6
-    assert pairs[0][0] == "what is `dmesg`?"
-    assert pairs[1][1] == "`dmesg --follow`"
-    assert pairs[2][0] == "is it possible to use python here as well?"
-    assert pairs[2][1][-3:] == "```"
-    assert pairs[4][0] == "how about double line questions?\nhere comes the second line"
-    assert pairs[5][1][-3:] == "```"
+    pairs = list(
+        yield_question_and_answer_pairs_from_body(
+            body, matchers_no_removal, matchers_removal
+        )
+    )
+    assert len(pairs) == 5
+    assert pairs[0][0] == "\\\\what is `dmesg`?"
+    assert pairs[4][0] == "is it possible to use python here as well?"
+    assert pairs[4][1][-3:] == "```"
+    assert (
+        pairs[2][0]
+        == "how about double line questions?\nhere comes the second line"
+    )

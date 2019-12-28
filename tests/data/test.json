@@ -1,0 +1,42 @@
+[
+	{
+		"title": "test_notes",
+		"tags": ["flashcards", "learning", "unix"],
+		"q_markdown": "\\\\what is `dmesg`?",
+		"a_markdown": "- *d*river *mes*a*g*e",
+		"q_html": "<p>\\\\what is <code>dmesg</code>?</p>",
+		"a_html": "<ul>\n<li><em>d</em>river <em>mes</em>a<em>g</em>e</li>\n</ul>"
+	},
+	{
+		"title": "test_notes",
+		"tags": ["flashcards", "learning", "unix"],
+		"q_markdown": "how about images?",
+		"a_markdown": "![](@attachment/image.png)",
+		"q_html": "<p>how about images?</p>",
+		"a_html": "<p><img alt=\"\" src=\"image.png\"></p>"
+	},
+	{
+		"title": "test_notes",
+		"tags": ["flashcards", "learning", "unix"],
+		"q_markdown": "how about double line questions?\nhere comes the second line",
+		"a_markdown": "- answer",
+		"q_html": "<p>how about double line questions?\nhere comes the second line</p>",
+		"a_html": "<ul>\n<li>answer</li>\n</ul>"
+	},
+	{
+		"title": "test_notes",
+		"tags": ["flashcards", "learning", "unix"],
+		"q_markdown": "how about mathjax latex $\\vec{a}$?",
+		"a_markdown": "$$\\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}$$",
+		"q_html": "<p>how about mathjax latex \\(\\vec{a}\\)?</p>",
+		"a_html": "<p>\\[\\begin{bmatrix}a&amp;b\\\\c&amp;d\\end{bmatrix}\\]</p>"
+	},
+	{
+		"title": "test_notes",
+		"tags": ["flashcards", "learning", "unix"],
+		"q_markdown": "is it possible to use python here as well?",
+		"a_markdown": "- yes, it is\n```python\nyes = \"it is\"\nprint(yes)\n```",
+		"q_html": "<p>is it possible to use python here as well?</p>",
+		"a_html": "<ul>\n<li>yes, it is</li>\n</ul>\n<table class=\"codehilitetable\"><tbody><tr><td class=\"linenos\"><div class=\"linenodiv\"><pre>1\n2</pre></div></td><td class=\"code\"><div class=\"codehilite\"><pre><span></span><span class=\"n\">yes</span> <span class=\"o\">=</span> <span class=\"s2\">\"it is\"</span>\n<span class=\"k\">print</span><span class=\"p\">(</span><span class=\"n\">yes</span><span class=\"p\">)</span>\n</pre></div>\n</td></tr></tbody></table>"
+	}
+]

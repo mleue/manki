@@ -1,3 +1,5 @@
+import json
+from typing import List
 import pytest
 from manki.note import NotesDirectory, NotesFile, Note, NoteSide
 
@@ -17,6 +19,12 @@ def test_notes_dir_yields_expected_paths(notes_dir: NotesDirectory):
 def notes_file(notes_dir: NotesDirectory):
     notes_files = list(notes_dir.yield_note_files())
     yield notes_files[0]
+
+
+@pytest.fixture
+def notes_true(notes_dir: NotesDirectory):
+    notes_true = json.loads((notes_dir.path / "test.json").read_text())
+    yield notes_true
 
 
 def test_notes_file_parses_frontmatter_correctly(notes_file: NotesFile):
@@ -52,7 +60,7 @@ def test_notes_file_yield_notes(notes_file: NotesFile):
         tag_whitelist, title_blacklist, question_regex, question_regex_removal
     )
     # all notes if tags whitelisted and title not blacklisted
-    assert len(list(notes)) == 6
+    assert len(list(notes)) == 5
 
 
 def test_notes_file_yield_notes_no_question_found(notes_file: NotesFile):
@@ -66,23 +74,23 @@ def test_notes_file_yield_notes_no_question_found(notes_file: NotesFile):
 
 
 @pytest.fixture
-def note(notes_file):
+def notes(notes_file):
     question_regex, question_regex_removal = [r"(.*\?)$"], [r"^\?(.*)"]
     tag_whitelist, title_blacklist = ["flashcards"], []
     notes = notes_file.yield_notes(
         tag_whitelist, title_blacklist, question_regex, question_regex_removal
     )
-    yield list(notes)[5]
+    yield list(notes)
 
 
-def test_note_attributes(notes_file: NotesFile, note: Note):
-    assert note.path == notes_file.path
-    assert note.tags == notes_file.tags
-    assert note.title == notes_file.title
-    assert note.context == notes_file.context
-    assert note.q_side.markdown == "easiest way to set the http response and/or headers manually?"
-    assert note.a_side.markdown[-3:] == "```"
-    assert note.a_side.html == '<ul>\n<li>return a tuple from an endpoint</li>\n</ul>\n<table class="codehilitetable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="n">test</span> <span class="o">=</span> <span class="n">a</span>\n</pre></div>\n</td></tr></tbody></table>'
+def test_note_attributes(notes: List[Note], notes_true):
+    for note, note_true in zip(notes, notes_true):
+        # print(repr(note.q_side.html).replace(r'"', r'\"'))
+        # print(repr(note.a_side.html).replace(r'"', r'\"'))
+        assert note.q_side.markdown == note_true["q_markdown"]
+        assert note.a_side.markdown == note_true["a_markdown"]
+        assert note.q_side.html == note_true["q_html"]
+        assert note.a_side.html == note_true["a_html"]
 
 
 def test_note_hashes_and_compares_equal():
