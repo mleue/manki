@@ -1,15 +1,25 @@
 ---
-title: test
+title: test notes
 tags: [Notebooks/flashcards/learning/unix]
 ---
-what is `dmesg`?
-- *d*river *mes*a*g*e
-- unix command that prints the message buffer of the kernel
 
-how can you follow the message stream from `dmesg`?
-`dmesg --follow`
+# test
+
+\\what is `dmesg`?
+- *d*river *mes*a*g*e
+
+how about images?
+![](@attachment/image.png)
+
+how about double line questions?
+?here comes the second line
+- answer
+
+how about mathjax latex $\vec{a}$ and $\vec{b}$?
+$$\begin{bmatrix}a&b\\c&d\end{bmatrix}$$
 
 is it possible to use python here as well?
+- yes, it is
 ```python
 yes = "it is"
 print(yes)
