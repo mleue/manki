@@ -13,8 +13,8 @@ from manki.io import (
 def test_get_files_from_dir_recursively(datadir):
     expected = [
         datadir / "test.txt",
-        datadir / "test.md",
         datadir / "test.json",
+        datadir / "test.md",
     ]
     assert expected == list(yield_files_from_dir_recursively(datadir))
 
@@ -24,7 +24,7 @@ def test_get_files_from_dir_recursively(datadir):
     [
         ([".md"], ["test.md"]),
         ([".txt"], ["test.txt"]),
-        ([], ["test.txt", "test.md", "test.json"]),
+        ([], ["test.txt", "test.json", "test.md"]),
     ],
 )
 def test_filter_paths_by_extension(datadir, extensions, exp_files):

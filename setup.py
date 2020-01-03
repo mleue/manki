@@ -19,6 +19,7 @@ setup(
         "markdown",
         "pygments",
         "selectolax",
+        "pymdown-extensions",
     ],
     extras_require={"dev": ["pytest"]},
 )

@@ -5,17 +5,15 @@ import markdown
 
 
 def markdown_to_html(markdown_text: str):
-    # TODO fix hacky solution for double escaped backslash "\\\\" error in
     # markdown parser
-    markdown_text = markdown_text.replace("\\\\", "\\\\\\\\")
     html = markdown.markdown(
         markdown_text,
-        extensions=["fenced_code", "codehilite"],
-        extension_configs={"codehilite": {"linenums": True}},
+        extensions=["fenced_code", "codehilite", "pymdownx.arithmatex"],
+        extension_configs={
+            "codehilite": {"linenums": True},
+            "pymdownx.arithmatex": {"generic": True},
+        },
     )
-    # TODO fix hacky replace of $eq$ or $$eq$$ tags
-    html = re.sub(r"\$\$(.*?)\$\$", r"\\[\1\\]", html)
-    html = re.sub(r"\$(.*?)\$", r"\\(\1\\)", html)
     return html
 
 
